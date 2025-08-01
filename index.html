@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0"
+        />
+        <link
+            rel="stylesheet"
+            href="style.css"
+        />
+        <link
+            rel="stylesheet"
+            href="form_style.css"
+        />
+        <link
+            rel="stylesheet"
+            href="buttons.css"
+        />
+        <title>toMicroservices</title>
+        <script
+            type="module"
+            src="./main.js"
+        ></script>
+        <script
+            type="module"
+            src="./form.js"
+        ></script>
+    </head>
+
+    <body>
+        <!-- Form de Inicialização -->
+        <div
+            id="window-overlay-form"
+            class="window-overlay"
+            style="display: block"
+        >
+            <div
+                id="window"
+                style="width: fit-content; height: fit-content; background: none; border: none; box-shadow: none"
+            >
+                <form
+                    id="input-form"
+                    class="form-box"
+                >
+                    <h2>toMicroservices</h2>
+
+                    <!-- <div class="input-group custom-file-button">
+                        <label class="input-group-text" for="log-entrada">Log de Entrada:</label>
+                        <input type="file" class="form-control" id="log-entrada" name="log-entrada" required />
+                    </div> -->
+
+                    <div class="custom-input-group">
+                        <label for="num-ms">Number of Microservices:</label>
+                        <input
+                            type="number"
+                            step="1"
+                            min="1"
+                            value="4"
+                            id="num-ms"
+                            name="num-ms"
+                            required
+                        />
+                    </div>
+
+                    <div class="custom-input-group">
+                        <label for="prob">Crossover Rate:</label>
+                        <input
+                            type="number"
+                            step="0.01"
+                            min="0"
+                            max="1"
+                            value="0.9"
+                            id="prob"
+                            name="prob"
+                            required
+                        />
+                    </div>
+
+                    <div class="custom-input-group">
+                        <label for="frac">Crossover Ratio:</label>
+                        <input
+                            type="number"
+                            step="0.01"
+                            min="0"
+                            max="1"
+                            value="0.5"
+                            id="frac"
+                            name="frac"
+                            required
+                        />
+                    </div>
+
+                    <div class="custom-input-group">
+                        <label for="executions">Number of Executions:</label>
+                        <input
+                            type="number"
+                            step="1"
+                            min="1"
+                            value="1"
+                            id="executions"
+                            name="executions"
+                            required
+                        />
+                    </div>
+
+                    <div
+                        class="custom-input-group"
+                        style="display: flex; align-items: center; gap: 5px; font-weight: 600"
+                    >
+                        <label for="interact-checkbox">User Interaction:</label>
+                        <input
+                            type="checkbox"
+                            id="interact-checkbox"
+                            name="interact-checkbox"
+                        />
+                    </div>
+
+                    <div
+                        class="custom-input-group"
+                        id="generations-div"
+                        style="font-weight: 600; display: none"
+                    >
+                        <label for="generations">Generation Amount:</label>
+                        <input
+                            type="number"
+                            step="1"
+                            min="1"
+                            value="10"
+                            id="generations"
+                            name="generations"
+                        />
+                    </div>
+
+                    <div
+                        class="custom-input-group"
+                        id="first-step-div"
+                        style="font-weight: 600; display: none"
+                    >
+                        <label for="first-step">First Step Interval:</label>
+                        <input
+                            type="number"
+                            step="1"
+                            min="1"
+                            value="1"
+                            id="first-step"
+                            name="first-step"
+                        />
+                    </div>
+
+                    <button
+                        type="submit"
+                        style="text-transform: uppercase; border-radius: 4px"
+                        id="submit-button"
+                        class="submit-button"
+                    >
+                        Run
+                    </button>
+
+                    <p style="font-weight: 600">or</p>
+
+                    <div
+                        class="input-group custom-file-button"
+                        style="width: 100%"
+                    >
+                        <label
+                            class="input-group-text"
+                            for="file-load-btn"
+                            style="padding: 10px"
+                            >Open Solution From File</label
+                        >
+                        <input
+                            type="file"
+                            class="form-control"
+                            id="file-load-btn"
+                            name="file-load-btn"
+                            style="display: none"
+                        />
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Janela de Aviso -->
+        <div
+            id="window-overlay-pop-up"
+            class="window-overlay"
+            style="display: none; z-index: 1000"
+        >
+            <div
+                id="window"
+                style="width: fit-content; height: fit-content; padding: 10px; width: 300px"
+            >
+                <!-- <div
+                    id="pop-up-header"
+                    class="window-header"
+                    style="padding: 3px; text-transform: uppercase; border-radius: 0px"
+                >
+                    Notice
+                </div> -->
+
+                <div
+                    id="pop-up-content"
+                    class="window-content"
+                    style="margin: 0px; flex-direction: column; justify-content: center; font-size: 16px"
+                >
+                    <p
+                        id="pop-up-text"
+                        style="margin: 0px; padding: 0px; text-align: center"
+                    ></p>
+                    <div
+                        id="pop-up-spinner"
+                        class="spinner"
+                    ></div>
+                    <p
+                        id="pop-up-text-2"
+                        style="margin: 0px; padding: 0px; text-align: center"
+                    ></p>
+                </div>
+
+                <form
+                    id="step-form"
+                    style="display: none; flex-direction: column; justify-items: center; align-items: center"
+                >
+                    <div
+                        class="custom-input-group"
+                        id="step-div"
+                        style="font-weight: 600; display: flex; justify-content: center; gap: 10px"
+                    >
+                        <label
+                            for="step"
+                            style="width: fit-content"
+                            >Step Size:</label
+                        >
+                        <input
+                            type="number"
+                            step="1"
+                            min="1"
+                            value="2"
+                            id="step"
+                            name="step"
+                            style="width: 30%; text-align: center"
+                            class="no-spinner"
+                        />
+                    </div>
+                    <button
+                        type="submit"
+                        id="send-btn"
+                        style="width: fit-content"
+                    >
+                        Send
+                    </button>
+                </form>
+
+                <div
+                    id="interaction-type-div"
+                    style="display: flex; justify-content: center; align-items: center; gap: 10px"
+                >
+                    <button
+                        id="get-all-btn"
+                        style="width: fit-content"
+                    >
+                        All Solutions
+                    </button>
+
+                    <button
+                        id="get-best-btn"
+                        style="width: fit-content"
+                    >
+                        Best Solutions
+                    </button>
+                </div>
+
+                <button
+                    id="pop-up-btn"
+                    style="width: fit-content; align-self: center"
+                    disabled="true"
+                >
+                    Load Solution
+                </button>
+            </div>
+        </div>
+
+        <!-- Janela de exibição de soluções candidatas -->
+        <div
+            id="window-overlay-table"
+            class="window-overlay"
+            style="display: none"
+        >
+            <div id="window">
+                <div class="window-header">Candidate Solutions</div>
+
+                <div
+                    id="window-content-table"
+                    class="window-content"
+                    style="margin: 0; padding: 0; overflow: hidden"
+                >
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Solution Index</th>
+                                <th>Microservices</th>
+                                <th>Coupling</th>
+                                <th>Cohesion</th>
+                                <th>Overhead</th>
+                                <th>Functionality</th>
+                                <th>Reuse</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-body">
+                            <!-- Preenchido dinamicamente -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <button
+                    id="table-confirm-btn"
+                    style="width: fit-content; align-self: flex-end"
+                >
+                    Confirm
+                </button>
+            </div>
+        </div>
+
+        <div
+            class="fleft"
+            style="display: none"
+        >
+            <div
+                class="menu-container"
+                style="display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%"
+            >
+                <div
+                    id="gen-info-div"
+                    style="display: flex; justify-content: center; gap: 5px"
+                >
+                    <b id="generation-b">Generation: </b>
+                    <hr
+                        id="gen-info-hr"
+                        style="margin: 0; padding: 0"
+                    />
+                    <b id="solution-index-b">Solution Index: </b>
+                </div>
+
+                <!-- Seleção de Métrica -->
+                <div
+                    id="obj-func-div"
+                    style="margin-top: 10px; margin-bottom: 10px; margin-left: 2px"
+                >
+                    <b>Objective Function:</b>
+                    <label
+                        class="select"
+                        for="slct"
+                    >
+                        <select
+                            id="slct"
+                            style="width: 100%"
+                            required="required"
+                        ></select>
+                        <svg>
+                            <use xlink:href="#select-arrow-down"></use>
+                        </svg>
+                    </label>
+                    <svg class="sprites">
+                        <symbol
+                            id="select-arrow-down"
+                            viewbox="0 0 10 6"
+                        >
+                            <polyline points="1 1 5 5 9 1"></polyline>
+                        </symbol>
+                    </svg>
+                </div>
+
+                <!-- Janela de métricas -->
+                <div style="display: flex; align-items: center; justify-content: center; gap: 0px">
+                    <h1 style="margin: 0px; padding: 0px; width: 100%">Metrics</h1>
+                    <svg
+                        id="down-arrow"
+                        width="30"
+                        height="30"
+                        viewBox="0 0 24 24"
+                        fill="#222"
+                        xmlns="http://www.w3.org/2000/svg"
+                    >
+                        <path d="M7 10l5 5 5-5H7z" />
+                    </svg>
+                </div>
+                <div
+                    id="metrics-container"
+                    class="list"
+                    style="width: 100%; display: none"
+                >
+                    <ul style="text-align: center; max-height: 35vh">
+                        <li id="CouplingPerMicroserviceArchitecture"></li>
+                        <li id="CohesionPerMicroserviceArchitecture"></li>
+                        <li id="OverheadMaxPerMicroserviceArchitecture"></li>
+                        <li id="FunctionalityPerMicroserviceArchitecture"></li>
+                        <li id="ReusePerMicroserviceArchitecture"></li>
+                    </ul>
+                </div>
+
+                <button
+                    class="button"
+                    role="button"
+                    id="change-solution-best-btn"
+                    style="margin-top: 10px; margin-bottom: 10px; width: 100%"
+                >
+                    Load Best Solutions
+                </button>
+
+                <button
+                    class="button"
+                    role="button"
+                    id="change-solution-all-btn"
+                    style="margin-bottom: 10px; width: 100%"
+                >
+                    Load All Solutions
+                </button>
+
+                <button
+                    class="window-split-accept-btn"
+                    role="button"
+                    id="apply-btn"
+                    style="margin-bottom: 10px; width: 100%"
+                >
+                    Apply Changes For Next Generations
+                </button>
+
+                <button
+                    class="window-close-btn"
+                    role="button"
+                    id="stop-interaction-btn"
+                    style="margin-bottom: 10px; width: 100%"
+                >
+                    Stop Interaction
+                </button>
+
+                <hr style="width: 100%" />
+
+                <!-- Botão de múltipla seleção de nós -->
+                <button
+                    style="
+                        z-index: 2;
+                        width: fit-content;
+                        height: fit-content;
+                        display: flex;
+                        align-items: center;
+                        gap: 10px;
+                        margin-top: 10px;
+                    "
+                    id="mult-select-btn"
+                    class="toggle-btn"
+                >
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 16 16"
+                        width="24"
+                        height="24"
+                        fill="currentColor"
+                        style="display: block; margin: 0"
+                    >
+                        <g>
+                            <path
+                                d="M10.5,15h-9C1.224,15,1,14.776,1,14.5v-9C1,5.224,1.224,5,1.5,5h9C10.776,5,11,5.224,11,5.5v9C11,14.776,10.776,15,10.5,15z M2,14h8V6H2V14z"
+                            />
+                            <path
+                                d="M12.5,13c-0.276,0-0.5-0.224-0.5-0.5V4H3.5C3.224,4,3,3.776,3,3.5S3.224,3,3.5,3h9C12.776,3,13,3.224,13,3.5v9C13,12.776,12.776,13,12.5,13z"
+                            />
+                            <path
+                                d="M14.5,11c-0.276,0-0.5-0.224-0.5-0.5V2H5.5C5.224,2,5,1.776,5,1.5S5.224,1,5.5,1h9C14.776,1,15,1.224,15,1.5v9C15,10.776,14.776,11,14.5,11z"
+                            />
+                        </g>
+                    </svg>
+                    Multiple Node Selection
+                </button>
+
+                <button
+                    class="button"
+                    role="button"
+                    id="reset"
+                    style="margin-bottom: 10px; margin-top: 10px; width: 100%"
+                >
+                    Arrange Nodes
+                </button>
+
+                <button
+                    class="button"
+                    role="button"
+                    id="save-btn"
+                    style="margin-bottom: 10px; width: 100%"
+                >
+                    Save Solution to File
+                </button>
+
+                <!-- Janela de informações do elemento selecionado -->
+                <div
+                    id="selection-container"
+                    class="list"
+                    style="
+                        display: none;
+                        padding: 2px;
+                        margin-top: 10px;
+                        width: 100%;
+                        max-height: fit-content;
+                        overflow: auto;
+                    "
+                >
+                    <div style="display: flex; align-items: center; justify-content: center; gap: 3px">
+                        <h1
+                            id="selection-name"
+                            style="width: fit-content; margin: 0px; padding: 0px"
+                            spellcheck="false"
+                            autocomplete="off"
+                        >
+                            <!-- Preenchido dinamicamente -->
+                        </h1>
+
+                        <svg
+                            id="edit-icon"
+                            width="20"
+                            height="20"
+                            viewBox="0 0 24 24"
+                            fill="#222"
+                            xmlns="http://www.w3.org/2000/svg"
+                        >
+                            <path d="M3 21h3.75L17.81 9.94l-3.75-3.75L3 17.25V21z" />
+                            <path
+                                d="M20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"
+                            />
+                        </svg>
+                    </div>
+
+                    <h2
+                        style="margin: 0px; padding: 0px 5px"
+                        id="calls-h2"
+                    >
+                        Calls:
+                    </h2>
+
+                    <h2
+                        style="margin: 0px; padding: 0px 5px"
+                        id="comp-h2"
+                    >
+                        Methods:
+                    </h2>
+
+                    <h2
+                        style="margin: 0px; padding: 0px 5px"
+                        id="func-h2"
+                    >
+                        Functionalities:
+                    </h2>
+
+                    <div
+                        class="list"
+                        id="func-list-container"
+                        style="display: none; border-style: none"
+                    >
+                        <ul
+                            style="text-align: left"
+                            id="func-list"
+                        >
+                            <!-- Preenchido dinamicamente -->
+                        </ul>
+                    </div>
+
+                    <div style="display: flex; justify-content: center; align-items: center">
+                        <button
+                            class="button"
+                            role="button"
+                            id="freeze-btn"
+                            style="
+                                margin: 10px 10px 0px 0px;
+                                min-width: 105px;
+                                width: fit-content;
+                                justify-content: center;
+                            "
+                        >
+                            Freeze
+                        </button>
+
+                        <button
+                            class="button"
+                            role="button"
+                            id="split-btn"
+                            style="
+                                margin: 10px 0px 0px 10px;
+                                min-width: 105px;
+                                width: fit-content;
+                                justify-content: center;
+                            "
+                        >
+                            Split
+                        </button>
+                    </div>
+
+                    <div style="display: flex; justify-content: center; align-items: center">
+                        <button
+                            class="button"
+                            role="button"
+                            id="move-btn"
+                            style="margin: 10px 10px; min-width: 105px; width: fit-content; justify-content: center"
+                        >
+                            Move
+                        </button>
+
+                        <button
+                            class="button"
+                            role="button"
+                            id="join-btn"
+                            style="margin: 10px 10px; min-width: 105px; width: fit-content; justify-content: center"
+                        >
+                            Join
+                        </button>
+                    </div>
+
+                    <div style="display: flex; justify-content: center; align-items: center">
+                        <button id="details-btn">
+                            <svg
+                                width="95"
+                                height="20"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="3"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            >
+                                <circle
+                                    cx="11"
+                                    cy="11"
+                                    r="8"
+                                ></circle>
+                                <line
+                                    x1="21"
+                                    y1="21"
+                                    x2="16.65"
+                                    y2="16.65"
+                                ></line>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Janela de exibição do grafo -->
+        <div
+            class="fright"
+            id="cy"
+            style="display: none"
+        >
+            <div
+                id="loading"
+                style="
+                    display: block;
+                    position: relative;
+                    width: fit-content;
+                    height: fit-content;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    font-size: 24px;
+                    color: #000;
+                "
+            >
+                Loading...
+            </div>
+        </div>
+
+        <!-- Lista de exibição de microsserviços congelados, divididos e unidos -->
+        <div
+            class="list"
+            id="changed-microservices-div"
+        >
+            <h3
+                style="text-align: center; padding: 5px; margin: 0px"
+                id="frozen-microservices-header"
+            >
+                Freeze
+            </h3>
+            <ul
+                style="text-align: center"
+                id="frozen-microservices-list"
+            >
+                <!-- Preenchido dinamicamente -->
+            </ul>
+
+            <hr style="width: 90%; height: 2px; background-color: #222; margin: 0px auto" />
+
+            <h3
+                style="text-align: center; padding: 5px; margin: 0px"
+                id="split-microservices-header"
+            >
+                Split
+            </h3>
+            <ul
+                style="text-align: center"
+                id="split-microservices-list"
+            >
+                <!-- Preenchido dinamicamente -->
+            </ul>
+
+            <hr style="width: 90%; height: 2px; background-color: #222; margin: 0px auto" />
+
+            <h3
+                style="text-align: center; padding: 5px; margin: 0px"
+                id="joined-microservices-header"
+            >
+                Join
+            </h3>
+            <ul
+                style="text-align: center"
+                id="joined-microservices-list"
+            >
+                <!-- Preenchido dinamicamente -->
+            </ul>
+        </div>
+
+        <!-- Legenda de Símbolos -->
+        <div
+            class="guide"
+            id="symbol-guide"
+            style="display: none"
+        >
+            <h3 style="margin: 0; text-align: center">Symbol Guide</h3>
+
+            <div
+                class="guide-elem-container"
+                style="margin-top: 8px"
+            >
+                <div
+                    class="guide-elem"
+                    style="background-color: #7ec0ee"
+                ></div>
+                <label style="margin-left: 10px">Freeze</label>
+            </div>
+
+            <div class="guide-elem-container">
+                <div class="guide-elem">
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 100 100"
+                        width="30"
+                        height="30"
+                    >
+                        <line
+                            x1="50"
+                            y1="0"
+                            x2="50"
+                            y2="100"
+                            stroke="white"
+                            stroke-width="8"
+                        />
+                    </svg>
+                </div>
+                <label style="margin-left: 10px">Split</label>
+            </div>
+
+            <div class="guide-elem-container">
+                <div class="guide-elem">
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 100 100"
+                        width="30"
+                        height="30"
+                    >
+                        <path
+                            d="M50 100 L30 80 L70 80 Z"
+                            fill="white"
+                        />
+                    </svg>
+                </div>
+                <label style="margin-left: 10px">Move In</label>
+            </div>
+
+            <div class="guide-elem-container">
+                <div class="guide-elem">
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 100 100"
+                        width="30"
+                        height="30"
+                    >
+                        <path
+                            d="M50 0 L30 20 L70 20 Z"
+                            fill="white"
+                        />
+                    </svg>
+                </div>
+                <label style="margin-left: 10px">Move Out</label>
+            </div>
+
+            <div
+                class="guide-elem-container"
+                style="margin-bottom: 0px"
+            >
+                <div class="guide-elem">
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 100 100"
+                        width="30"
+                        height="30"
+                    >
+                        <path
+                            d="M50 80 L30 100 L70 100 Z"
+                            fill="white"
+                        />
+                        <path
+                            d="M50 20 L30 0 L70 0 Z"
+                            fill="white"
+                        />
+                    </svg>
+                </div>
+                <label style="margin-left: 10px">Join</label>
+            </div>
+        </div>
+
+        <!-- Janela de exibição de detalhes -->
+        <div
+            id="window-overlay-info"
+            class="window-overlay"
+        >
+            <div id="window">
+                <div
+                    id="window-header"
+                    class="window-header"
+                >
+                    Selection
+                </div>
+                <div
+                    id="window-content"
+                    class="window-content"
+                >
+                    <div style="width: 40%">
+                        <h1
+                            id="functionalities-header"
+                            style="margin: 0px 0px 3px 0px"
+                        >
+                            Functionalities
+                        </h1>
+                        <ul
+                            id="functionalities-list-window"
+                            class="functionalities-list"
+                        >
+                            <!-- Preenchido dinamicamente -->
+                        </ul>
+                    </div>
+
+                    <hr />
+
+                    <div style="width: 100%">
+                        <h1
+                            id="components-header"
+                            style="margin: 0px 0px 3px 0px"
+                        >
+                            Methods
+                        </h1>
+                        <ul
+                            id="components-list-window"
+                            style="border: none"
+                        >
+                            <!-- Preenchido dinamicamente -->
+                        </ul>
+                    </div>
+                </div>
+                <button
+                    id="window-close-btn"
+                    class="window-close-btn"
+                    style="width: fit-content; align-self: flex-end"
+                >
+                    Close
+                </button>
+            </div>
+        </div>
+
+        <!-- Janela para divisão de microsserviços -->
+        <div
+            id="window-overlay-split"
+            class="window-overlay"
+        >
+            <div id="window">
+                <div
+                    id="window-split-header"
+                    class="window-header"
+                    style="color: #000"
+                >
+                    Split
+                </div>
+                <div
+                    id="window-content"
+                    class="window-content"
+                >
+                    <div style="width: 40%">
+                        <h1
+                            id="functionalities-header"
+                            style="margin: 0px 0px 3px 0px"
+                        >
+                            Functionalities
+                        </h1>
+                        <ul
+                            id="functionalities-list-split"
+                            class="functionalities-list"
+                        >
+                            <!-- Preenchido dinamicamente -->
+                        </ul>
+                    </div>
+
+                    <hr />
+
+                    <div style="width: 100%">
+                        <h1
+                            id="split-components-header"
+                            style="margin: 0px 0px 3px 0px"
+                        >
+                            Methods
+                        </h1>
+                        <div style="display: flex; justify-content: space-between; width: 100%; height: 100%">
+                            <div style="width: 50%; height: 100%">
+                                <h2
+                                    id="msA-label"
+                                    style="text-align: center; margin: 0px"
+                                >
+                                    Microservice A
+                                </h2>
+                                <ul
+                                    id="droppable-list-A"
+                                    class="droppable-list"
+                                    style="border: none; width: 100%; height: 85%; overflow-y: auto"
+                                >
+                                    <!-- Preenchido dinamicamente -->
+                                </ul>
+                            </div>
+
+                            <div
+                                style="
+                                    display: flex;
+                                    flex-direction: column;
+                                    align-items: center;
+                                    gap: 20px;
+                                    width: fit-content;
+                                    height: 100%;
+                                    justify-content: center;
+                                    margin: 0px 10px;
+                                "
+                            >
+                                <button
+                                    id="move-to-b"
+                                    title="Mover para B"
+                                    class="move-btn"
+                                    style="font-size: 30px; padding: 0px; background: none; height: 24px"
+                                >
+                                    <svg
+                                        width="24"
+                                        height="24"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                    >
+                                        <path
+                                            d="M10 6L16 12L10 18"
+                                            stroke="#333"
+                                            stroke-width="2"
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                        />
+                                    </svg>
+                                </button>
+                                <button
+                                    id="move-to-a"
+                                    title="Mover para A"
+                                    class="move-btn"
+                                    style="font-size: 30px; padding: 0px; background: none; height: 24px"
+                                >
+                                    <svg
+                                        width="24"
+                                        height="24"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                    >
+                                        <path
+                                            d="M14 6L8 12L14 18"
+                                            stroke="#333"
+                                            stroke-width="2"
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                        />
+                                    </svg>
+                                </button>
+                            </div>
+
+                            <div style="width: 50%; height: 100%">
+                                <h2
+                                    id="msB-label"
+                                    style="text-align: center; margin: 0px"
+                                >
+                                    New Microservice
+                                </h2>
+                                <ul
+                                    id="droppable-list-B"
+                                    class="droppable-list"
+                                    style="border: none; width: 100%; height: 85%; overflow-y: auto"
+                                >
+                                    <!-- Preenchido dinamicamente -->
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display: flex; justify-content: end; gap: 10px">
+                    <button
+                        id="window-split-accept-btn"
+                        class="window-split-accept-btn"
+                        style="width: fit-content; align-self: flex-end"
+                    >
+                        Confirm
+                    </button>
+
+                    <button
+                        id="window-split-close-btn"
+                        class="window-close-btn"
+                        style="width: fit-content; align-self: flex-end"
+                    >
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Balão de aviso de mouse -->
+        <div id="mouse-pop-up"></div>
+
+        <!--  -->
+    </body>
+</html>
